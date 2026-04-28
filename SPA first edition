@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-double initial(double yi, double sigma);
-double cal_r_for_fnode(Alist *matrix,  int a, double caly[])
 
 
 typedef struct{
@@ -11,6 +9,9 @@ typedef struct{
     int *col_weight, *row_weight;
     int **col_index, **row_index;
 }Alist;
+
+double initial(double yi, double sigma);
+double cal_r_for_fnode(Alist *matrix,  int a, double caly[])
 
 Alist* readalist(const char *matrix){
     FILE *fp = fopen(matrix, "r");
@@ -31,7 +32,7 @@ Alist* readalist(const char *matrix){
     alist->col_index = (int **)malloc(alist->N * sizeof(int *));
     for(int i = 0; i < alist->N; i++){
         alist->col_index[i] = (int *)malloc(alist->max_col * sizeof(int));
-        for(int j = 0; alist->max_col; j++){
+        for(int j = 0; j < alist->max_col; j++){
             fscanf(fp, "%d", &alist->col_index[i][j]);
         }
     }
@@ -39,7 +40,7 @@ Alist* readalist(const char *matrix){
     alist->row_index = (int **)malloc(alist->M * sizeof(int *));
     for(int i = 0; i < alist->M; i++){
         alist->row_index[i] = (int *)malloc(alist->max_row * sizeof(int));
-        for(int j = 0; alist->max_row; j++){
+        for(int j = 0; j< alist->max_row; j++){
             fscanf(fp, "%d", &alist->row_index[i][j]);
         }
     }
@@ -63,10 +64,11 @@ int main(){
         scanf("%lf", &y[count]);
         if (y[count] == -1) break;
         caly[count] = initial(y[count], sigma);
-        count --;
+        count ++;
     }
 
-    double r_matrix[matrix->N + 50][matrix->M + 50] = {0};
+    int N_size = matrix->N + 50, M_size = matrix->M + 50;
+    double r_matrix[N_size][M_size] = {0};
     int colwei = Hmatrix->col_weight[0]; //needed to change
     for(int j = 0; j < colwei; j ++){
         int degree = Hmatrix->col_index[colwei][j]
@@ -92,8 +94,8 @@ double cal_r_for_fnode(Alist *matrix,  int a, double caly[]){
     int d;
     for(int i = 0; i < a_row_num; i ++){
         d = matrix->row_index[a][i];
-        if(d != a){
-            b = 1.0- (2.0 * caly[d]);
+        if((d-1) != a){
+            b = 1.0- (2.0 * caly[d-1]);
             c *= b;
         }
     }
