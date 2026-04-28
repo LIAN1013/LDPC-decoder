@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+double initial(double yi, double sigma);
+double cal_r_for_fnode(Alist *matrix,  int a, double caly[])
+
+
+typedef struct{
+    int N, M, max_col, max_row;
+    int *col_weight, *row_weight;
+    int **col_index, **row_index;
+}Alist;
+
+Alist* readalist(const char *matrix){
+    FILE *fp = fopen(matrix, "r");
+    Alist *alist = (Alist *)malloc(sizeof(Alist));
+    fscanf(fp, "%d %d", &alist->N, &alist->M);
+    fscanf(fp, "%d %d", &alist->max_col, &alist->max_row);
+
+    alist->col_weight = (int *)malloc(alist->N * sizeof(int));
+    alist->row_weight = (int *)malloc(alist->M * sizeof(int));
+
+    for(int i = 0; i < alist->N; i++){
+        fscanf(fp, "%d", &alist->col_weight[i]);
+    }
+    for(int i = 0; i < alist->M; i++){
+        fscanf(fp, "%d", &alist->row_weight[i]);
+    }
+
+    alist->col_index = (int **)malloc(alist->N * sizeof(int *));
+    for(int i = 0; i < alist->N; i++){
+        alist->col_index[i] = (int *)malloc(alist->max_col * sizeof(int));
+        for(int j = 0; alist->max_col; j++){
+            fscanf(fp, "%d", &alist->col_index[i][j]);
+        }
+    }
+
+    alist->row_index = (int **)malloc(alist->M * sizeof(int *));
+    for(int i = 0; i < alist->M; i++){
+        alist->row_index[i] = (int *)malloc(alist->max_row * sizeof(int));
+        for(int j = 0; alist->max_row; j++){
+            fscanf(fp, "%d", &alist->row_index[i][j]);
+        }
+    }
+
+    fclose(fp);
+    return alist;
+}
+int main(){
+    Alist *Hmatrix = readalist("filename"); //insert file name
+    double sigma ;
+   // int matrix_num;
+    //matrix_num = (Hmatrix->N) + (Hmatrix->M);
+    int received_len = Hmatrix->N;
+    double y[received_len+50] = {0}, caly[received_len+50] = {0};  //caly = calculated y
+
+    printf("enter sigma^2\n");
+    scanf("%lf", &sigma);
+
+    int count = 0;
+    while (count < received_len) {
+        scanf("%lf", &y[count]);
+        if (y[count] == -1) break;
+        caly[count] = initial(y[count], sigma);
+        count --;
+    }
+
+    double r_matrix[matrix->N + 50][matrix->M + 50] = {0};
+    int colwei = Hmatrix->col_weight[0]; //needed to change
+    for(int j = 0; j < colwei; j ++){
+        int degree = Hmatrix->col_index[colwei][j]
+        for(int i = 0; i < Hmatrix->N; i ++){
+            double cal_r = cal_r_for_fnode(Hmatrix, i, &caly[0]); //0 has to be changed later(node f0)
+            r_matrix[][]
+        }
+    }
+    printf("\nEnd");
+    return 0;
+}
+
+double initial(double yi, double sigma){
+    double a, b;
+    b = 2 * yi / sigma;
+    a = 1.0 / (1.0 + exp(b));
+    return a;
+}
+
+double cal_r_for_fnode(Alist *matrix,  int a, double caly[]){
+    double b, c = 1.0; // double use 1.0 instead of integer 1
+    int a_row_num = matrix->row_weight[a];
+    int d;
+    for(int i = 0; i < a_row_num; i ++){
+        d = matrix->row_index[a][i];
+        if(d != a){
+            b = 1.0- (2.0 * caly[d]);
+            c *= b;
+        }
+    }
+    return (0.5 + 0.5 * c) ;
+}
