@@ -8,7 +8,7 @@
 /**
     INFORMATION:
     1. L(qij)=L(ci)=2yi/sigma^2 in BI-AWANG Channel
-    2. Row ¦C(¤ô¥­) Column ¦æ(««ª½)
+    2. Row åˆ—(æ°´å¹³) Column è¡Œ(åž‚ç›´)
     3. Example use (8,4) Min-Sum Decoder example in RYAN_LDPC
         (ppt example in page 36-37)
     4. PRINTF add -><- to prevent unexpected blank or \n
@@ -31,7 +31,7 @@ int N=-1,K=-1,M=-1;    // H(7,4) hamming code
 RowInfo *H_rows=NULL;
 ColInfo *H_cols=NULL;
 
-// ¥Ø«e±µ¦¬ºÝ¼È®É¼g¦º¡A¥i§ï¦¨°Æ¨ç¦¡¶}ÀÉÅª¨ú
+// ç›®å‰æŽ¥æ”¶ç«¯æš«æ™‚å¯«æ­»ï¼Œå¯æ”¹æˆå‰¯å‡½å¼é–‹æª”è®€å–
 double channel_output[20]={-1.5,0.8,-0.9,0.7,0.5,-1.1,-0.4,-1.2};
 
 
@@ -54,7 +54,7 @@ double channel_output[20]={-1.5,0.8,-0.9,0.7,0.5,-1.1,-0.4,-1.2};
 
  **/
 
-// ³oÃäÁÙ¨S°µ¨ì
+// é€™é‚Šé‚„æ²’åšåˆ°
 // FAILED to save now!!!!!
 void Save_H_MatrixByAlist(void)
 {
@@ -210,7 +210,7 @@ int main(void)
         for(int i=0;i<N;i++){ReturnTotal[i]=0,ReturnTotalExceptI[i]=0;}
 
         // Count phi beta i'j before summation
-        // ¥Ñ©óphi¼Æ¦b¤@¦¸­¡¥N¤¤¤£·|§ó°Ê¡A¦]¦¹¦A­¡¥N«e¥ý´£«e­pºâ
+        // ç”±æ–¼phiæ•¸åœ¨ä¸€æ¬¡è¿­ä»£ä¸­ä¸æœƒæ›´å‹•ï¼Œå› æ­¤å†è¿­ä»£å‰å…ˆæå‰è¨ˆç®—
         printf("ITERATION %d PHIBETA Pre Calculate\n",decoder_iteration);
         for(int j=0;j<N;j++){
             phibeta[j]=phi(fabs(LLR_Current[j]));
@@ -230,7 +230,7 @@ int main(void)
             /// INITIAL
             for(int j=0;j<H_rows[i].row_weight;j++){isNegativeI[j]=1;}
 
-            // ²Ä¤@¹M¹M¾ú¨C¤@row¡A¥ý²Î­p¨C¤@row¤¤ªº­t¸¹¦ì¸m©M­pºâÁ`­t¸¹¼Æ¶q»PÁ`phi¼Æ­È
+            // ç¬¬ä¸€ééæ­·æ¯ä¸€rowï¼Œå…ˆçµ±è¨ˆæ¯ä¸€rowä¸­çš„è² è™Ÿä½ç½®å’Œè¨ˆç®—ç¸½è² è™Ÿæ•¸é‡èˆ‡ç¸½phiæ•¸å€¼
             printf("ITERATION %d-%d FIRST SETP\n",decoder_iteration,i);
             for(int j=0;j<H_rows[i].row_weight;j++)// EX 2,3,4,5 in Hamming code first line
             {
@@ -242,7 +242,7 @@ int main(void)
                 printf("%dTotalphi=%llf  ",j,TotalPhi);
             }printf("\n");
 
-            // ²Ä¤G¹M¹M¾ú­pºâ¥X¥Î©ó³Ì²×µ²ªGªº¦^¶Ç­È(¥HÁ`­t¸¹©MÁ`phi¼Æ­È­pºâ)©MÄ~Äò­¡¥NªºLLR(¥HÁ`­t¸¹¦©°£¸Ó¦ì¸m­t¸¹¼Æ¶q§PÂ_¥¿­t¡A¥HÁ`phi­È¦©°£¸Ó¦ì¸mphi¼Æ­È§PÂ_¼Æ­È¤j¤p)
+            // ç¬¬äºŒééæ­·è¨ˆç®—å‡ºç”¨æ–¼æœ€çµ‚çµæžœçš„å›žå‚³å€¼(ä»¥ç¸½è² è™Ÿå’Œç¸½phiæ•¸å€¼è¨ˆç®—)å’Œç¹¼çºŒè¿­ä»£çš„LLR(ä»¥ç¸½è² è™Ÿæ‰£é™¤è©²ä½ç½®è² è™Ÿæ•¸é‡åˆ¤æ–·æ­£è² ï¼Œä»¥ç¸½phiå€¼æ‰£é™¤è©²ä½ç½®phiæ•¸å€¼åˆ¤æ–·æ•¸å€¼å¤§å°)
             printf("ITERATION %d-%d SECOND SETP\n",decoder_iteration,i);
             for(int j=0;j<H_rows[i].row_weight;j++)
             {
@@ -270,7 +270,7 @@ int main(void)
         for(int i=0;i<N;i++)
         {
             printf("LLR Before->%llf   ",LLR_Current[i]);
-            // ¤£¥i¥æ´«
+            // ä¸å¯äº¤æ›
             LLR_FinalResult[i]=LLR_Current[i]+ReturnTotal[i];
             LLR_Current[i]+=ReturnTotalExceptI[i];
             printf("LLR After->%llf\n",LLR_Current[i]);
