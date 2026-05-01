@@ -1,0 +1,4 @@
+HammingCodeEX是H矩陣的ALIST檔案
+LogDominSPADecoder是SPA原始檔案，先保留不要更動，如果要修正上傳新的檔案不要直接覆蓋
+MinSum也一樣是原始檔案，保留不要更動，如果要修正上傳新的檔案不要直接覆蓋
+
