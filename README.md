@@ -1,3 +1,5 @@
-HammingCodeEX是H矩陣的ALIST檔案
-LogDominSPADecoder是SPA原始檔案，MinSum也是，先保留不要更動，如果要修正上傳新的檔案不要直接覆蓋
+HammingCodeEX是H矩陣的ALIST檔案  
+
+LogDominSPADecoder是SPA原始檔案，MinSum也是，先保留不要更動，如果要修正上傳新的檔案不要直接覆蓋  
+
 MinSumVer2包含了minsum和自動創建合法codeword，可以調整雜訊SNR->Eb創造過AWGN的碼字，也可以調整運行次數
