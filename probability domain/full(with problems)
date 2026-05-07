@@ -75,7 +75,7 @@ int main() {
         count++;
     }
 
-    // 修正：VLA 不能用 {0} 初始化，改用 memset
+    //不能用 {0} 初始化，改用 memset
     double q1_matrix[N_size][M_size];
     memset(q1_matrix, 0, sizeof(q1_matrix));
 
@@ -127,8 +127,8 @@ int main() {
                 double q0_prod = caly[i];
                 double q1_prod = 1.0 - caly[i];
 
-                for (int l = 0; l < Hmatrix->col_weight[i]; l++) {
-                    int neighbor_row = Hmatrix->col_index[i][l] - 1;
+                for (int u = 0; u < Hmatrix->col_weight[i]; u++) {
+                    int neighbor_row = Hmatrix->col_index[i][u] - 1;
                     if (neighbor_row >= 0 && neighbor_row != target_row) {
                         q0_prod *= r_matrix[neighbor_row][i];
                         q1_prod *= (1.0 - r_matrix[neighbor_row][i]);
