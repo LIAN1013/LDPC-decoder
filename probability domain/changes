@@ -7,7 +7,9 @@
 位元 5: P(1)=1.000000, 判定為 1
 位元 6: P(1)=1.000000, 判定為 1
 位元 7: P(1)=1.000000, 判定為 1
-a list 補0(可能還需要改一下)
+不要用alist->max_col讀檔案，用alist->col_weight[i]
+
+
 
 2. initial算出來的是P(1)，原本的程式Q和q的定義寫反了
    double Q1_all = caly[i];  
