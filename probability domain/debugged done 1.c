@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 
 typedef struct {
     int N, M, max_col, max_row;
@@ -36,7 +37,7 @@ Alist* readalist(const char *matrix) {
     alist->col_index = (int **)malloc(alist->N * sizeof(int *));
     for (int i = 0; i < alist->N; i++) {
         alist->col_index[i] = (int *)malloc(alist->max_col * sizeof(int));
-        for (int j = 0; j < alist->max_col; j++) {
+        for (int j = 0; j < alist->col_weight[i]; j++) {
             fscanf(fp, "%d", &alist->col_index[i][j]);
         }
     }
@@ -44,7 +45,7 @@ Alist* readalist(const char *matrix) {
     alist->row_index = (int **)malloc(alist->M * sizeof(int *));
     for (int i = 0; i < alist->M; i++) {
         alist->row_index[i] = (int *)malloc(alist->max_row * sizeof(int));
-        for (int j = 0; j < alist->max_row; j++) {
+        for (int j = 0; j < alist->row_weight[i]; j++) {
             fscanf(fp, "%d", &alist->row_index[i][j]);
         }
     }
@@ -54,6 +55,9 @@ Alist* readalist(const char *matrix) {
 }
 
 int main() {
+    time_t start_read, end_read, start_run, end_run;
+    time(&start_read);
+    //start reading
     Alist *Hmatrix = readalist("test.txt");
     if (!Hmatrix) return 1;
 
@@ -74,8 +78,12 @@ int main() {
         caly[count] = initial(y[count], sigma);
         count++;
     }
+    time(&end_read);
+
 
     //不能用 {0} 初始化，改用 memset
+    //start decoding
+    time(&start_run);
     double q1_matrix[N_size][M_size];
     memset(q1_matrix, 0, sizeof(q1_matrix));
 
@@ -144,8 +152,8 @@ int main() {
         printf("\n");
         iter++;
     }
-
-    printf("End\n");
+    time(&end_run);
+    printf("read time: %ld\nrun time: %ld\n", end_read-start_read, end_run-start_run);
     return 0;
 }
 
