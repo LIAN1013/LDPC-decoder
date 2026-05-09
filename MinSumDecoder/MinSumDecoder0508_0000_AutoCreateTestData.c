@@ -8,12 +8,12 @@
 
 /**
 
-    V ¤@¤Á¥HH¯x°}Àu¥ı¡A¥ıÅª¨úH¯x°}
-    X ®Ú¾ÚH¯x°}¥Í¦¨G¯x°}
-    X ®Ú¾ÚG¯x°}¥Í¦¨¦h²Õ¦Xªkcodeword
-    V ®Ú¾Ú¦Xªkcodeword¥Í¦¨¦hµ§¸g¹LAWGN³q¹Dªº´ú¸Õ¸ê°Ty(³q¹DÂø°TÅÜ²§¼Æ¤£¦P)
-    V ®Ú¾Úy¸Ñ½X¡AÀË¬d¸Ñ½X¬O§_¦¨¥\
-    X ­pºâ®É¶¡®Ä²v
+    V ä¸€åˆ‡ä»¥HçŸ©é™£å„ªå…ˆï¼Œå…ˆè®€å–HçŸ©é™£
+    X æ ¹æ“šHçŸ©é™£ç”ŸæˆGçŸ©é™£
+    X æ ¹æ“šGçŸ©é™£ç”Ÿæˆå¤šçµ„åˆæ³•codeword
+    V æ ¹æ“šåˆæ³•codewordç”Ÿæˆå¤šç­†ç¶“éAWGNé€šé“çš„æ¸¬è©¦è³‡è¨Šy(é€šé“é›œè¨Šè®Šç•°æ•¸ä¸åŒ)
+    V æ ¹æ“šyè§£ç¢¼ï¼Œæª¢æŸ¥è§£ç¢¼æ˜¯å¦æˆåŠŸ
+    X è¨ˆç®—æ™‚é–“æ•ˆç‡
 
 **/
 
@@ -21,7 +21,7 @@
 /**
     INFORMATION:
     1. L(qij)=L(ci)=2yi/sigma^2 in BI-AWANG Channel
-    2. Row ¦C(¤ô¥­) Column ¦æ(««ª½)
+    2. Row åˆ—(æ°´å¹³) Column è¡Œ(å‚ç›´)
     3. Example use (8,4) Min-Sum Decoder example in RYAN_LDPC
         (ppt example in page 36-37)
     4. PRINTF add -><- to prevent unexpected blank or \n
@@ -134,7 +134,7 @@ void Read_H_MatrixByAlist(void)
 }
 
 
-// »²§U¨ç¦¡¡G±N Dense ¯x°}¼g¤J Alist ÀÉ®×
+// è¼”åŠ©å‡½å¼ï¼šå°‡ Dense çŸ©é™£å¯«å…¥ Alist æª”æ¡ˆ
 void Write_Dense_To_Alist(const char* filename, int **matrix, int rows, int cols) {
     FILE *fp = fopen(filename, "w");
     if (!fp) {
@@ -146,7 +146,7 @@ void Write_Dense_To_Alist(const char* filename, int **matrix, int rows, int cols
     int *row_weights = (int *)calloc(rows, sizeof(int));
     int max_col_w = 0, max_row_w = 0;
 
-    // 1. ²Î­pÅv­«
+    // 1. çµ±è¨ˆæ¬Šé‡
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             if (matrix[i][j] == 1) {
@@ -158,16 +158,16 @@ void Write_Dense_To_Alist(const char* filename, int **matrix, int rows, int cols
     for (int j = 0; j < cols; j++) if (col_weights[j] > max_col_w) max_col_w = col_weights[j];
     for (int i = 0; i < rows; i++) if (row_weights[i] > max_row_w) max_row_w = row_weights[i];
 
-    // 2. ¼g¤J N M »P³Ì¤jÅv­«
+    // 2. å¯«å…¥ N M èˆ‡æœ€å¤§æ¬Šé‡
     fprintf(fp, "%d %d\n%d %d\n", cols, rows, max_col_w, max_row_w);
 
-    // 3. ¼g¤J¦UÄæ»P¦U¦CÅv­«
+    // 3. å¯«å…¥å„æ¬„èˆ‡å„åˆ—æ¬Šé‡
     for (int j = 0; j < cols; j++) fprintf(fp, "%d ", col_weights[j]);
     fprintf(fp, "\n");
     for (int i = 0; i < rows; i++) fprintf(fp, "%d ", row_weights[i]);
     fprintf(fp, "\n");
 
-    // 4. ¼g¤J Column-wise «D¹s¦ì¸m (1-based)
+    // 4. å¯«å…¥ Column-wise éé›¶ä½ç½® (1-based)
     for (int j = 0; j < cols; j++) {
         for (int i = 0; i < rows; i++) {
             if (matrix[i][j] == 1) fprintf(fp, "%d ", i + 1);
@@ -175,7 +175,7 @@ void Write_Dense_To_Alist(const char* filename, int **matrix, int rows, int cols
         fprintf(fp, "\n");
     }
 
-    // 5. ¼g¤J Row-wise «D¹s¦ì¸m (1-based)
+    // 5. å¯«å…¥ Row-wise éé›¶ä½ç½® (1-based)
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             if (matrix[i][j] == 1) fprintf(fp, "%d ", j + 1);
@@ -188,16 +188,16 @@ void Write_Dense_To_Alist(const char* filename, int **matrix, int rows, int cols
     free(row_weights);
 }
 
-// ®Ö¤ß°Æ¨ç¦¡¡GÀu¤Æ H ¯x°}¨Ã¼g¤JÀÉ®×
+// æ ¸å¿ƒå‰¯å‡½å¼ï¼šå„ªåŒ– H çŸ©é™£ä¸¦å¯«å…¥æª”æ¡ˆ
 void Optimize_H_To_Alist() {
-    // 1. Åª¨ú­ì©l H
+    // 1. è®€å–åŸå§‹ H
     Read_H_MatrixByAlist();
     if (N <= 0 || M <= 0) return;
 
     int K = N - M;
     int i, j, r, c;
 
-    // 2. «Ø¥ß Dense ¯x°}¶i¦æ°ª´µ®ø¥h
+    // 2. å»ºç«‹ Dense çŸ©é™£é€²è¡Œé«˜æ–¯æ¶ˆå»
     int **h_dense = (int **)malloc(M * sizeof(int *));
     for (i = 0; i < M; i++) {
         h_dense[i] = (int *)calloc(N, sizeof(int));
@@ -206,21 +206,21 @@ void Optimize_H_To_Alist() {
         }
     }
 
-    // 3. °ª´µ-¬ù¥¹®ø¥hªk¡G±N¥k°¼ M x M °Ï°ì¤Æ¬°³æ¦ì¯x°} I
+    // 3. é«˜æ–¯-ç´„æ—¦æ¶ˆå»æ³•ï¼šå°‡å³å´ M x M å€åŸŸåŒ–ç‚ºå–®ä½çŸ©é™£ I
     for (i = 0; i < M; i++) {
-        int pivot_col = K + i; // ¥Ø¼Ğ¬O¤ÆÂ²³Ì«á M ­Ó Columns
+        int pivot_col = K + i; // ç›®æ¨™æ˜¯åŒ–ç°¡æœ€å¾Œ M å€‹ Columns
         int pivot_row = i;
 
-        // A. ´M§ä¸Ó Column ¤¤ªº Pivot (1)
+        // A. å°‹æ‰¾è©² Column ä¸­çš„ Pivot (1)
         while (pivot_row < M && h_dense[pivot_row][pivot_col] == 0) pivot_row++;
 
         if (pivot_row < M) {
-            // ¥æ´« Rows
+            // äº¤æ› Rows
             int *temp = h_dense[i];
             h_dense[i] = h_dense[pivot_row];
             h_dense[pivot_row] = temp;
 
-            // B. ®ø¥h¸Ó Column ¤¤¨ä¥L©Ò¦³ Row ªº 1 (GF(2) XOR)
+            // B. æ¶ˆå»è©² Column ä¸­å…¶ä»–æ‰€æœ‰ Row çš„ 1 (GF(2) XOR)
             for (r = 0; r < M; r++) {
                 if (r != i && h_dense[r][pivot_col] == 1) {
                     for (c = 0; c < N; c++) {
@@ -233,13 +233,13 @@ void Optimize_H_To_Alist() {
         }
     }
 
-    // 4. ¼g¤J·sªº Alist ÀÉ®×
+    // 4. å¯«å…¥æ–°çš„ Alist æª”æ¡ˆ
     char output_path[] = "C:\\Users\\09043\\OneDrive\\Python\\LDPC\\H_Optimized_Alist.txt";
     Write_Dense_To_Alist(output_path, h_dense, M, N);
 
     printf("Optimized H [P|I] has been written to: %s\n", output_path);
 
-    // 5. ²M²z°O¾ĞÅé
+    // 5. æ¸…ç†è¨˜æ†¶é«”
     for (i = 0; i < M; i++) free(h_dense[i]);
     free(h_dense);
 }
@@ -247,11 +247,11 @@ void Optimize_H_To_Alist() {
 
 
 
-// (DO NOT CHANGE!!!)¥Í¦¨°ª´µÂø°T
+// (DO NOT CHANGE!!!)ç”Ÿæˆé«˜æ–¯é›œè¨Š
 double generate_gaussian(double sigma) {
     double u1 = (double)rand() / RAND_MAX;
     double u2 = (double)rand() / RAND_MAX;
-    if (u1 <= 0.0) u1 = 1e-9; // Á×§K log(0)
+    if (u1 <= 0.0) u1 = 1e-9; // é¿å… log(0)
     double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * 3.14159265358979323846 * u2);
     return z0 * sigma;
 }
@@ -264,7 +264,7 @@ void Generate_TestData(const int count, int N, int M, double EbN0_dB) {
         return;
     }
 
-    // ­pºâ Sigma
+    // è¨ˆç®— Sigma
     double rate = (double)(N - M) / N;
     double snr = pow(10.0, EbN0_dB / 10.0);
     double sigma = sqrt(1.0 / (2.0 * rate * snr));
@@ -273,17 +273,17 @@ void Generate_TestData(const int count, int N, int M, double EbN0_dB) {
 
     int *codeword = (int *)calloc(N, sizeof(int));
     for (int c = 0; c < count; c++) {
-        // --- 1. ¥Í¦¨ Codeword (³o¸Ì¼È¥Î¥ş¹s¡A­Y¦³ G ¯x°}¥i§ï¬°ÀH¾÷½X) ---
-        // ´£¥Ü¡G­Y­n´ú¸Õ¤£¦P½X¦r¡A¥iÀH¾÷¥Í¦¨¦ì¤¸¡A¦ı¶·½T«Oº¡¨¬ Hc^T = 0
+        // --- 1. ç”Ÿæˆ Codeword (é€™è£¡æš«ç”¨å…¨é›¶ï¼Œè‹¥æœ‰ G çŸ©é™£å¯æ”¹ç‚ºéš¨æ©Ÿç¢¼) ---
+        // æç¤ºï¼šè‹¥è¦æ¸¬è©¦ä¸åŒç¢¼å­—ï¼Œå¯éš¨æ©Ÿç”Ÿæˆä½å…ƒï¼Œä½†é ˆç¢ºä¿æ»¿è¶³ Hc^T = 0
         for (int i = 0; i < N; i++) {
             fprintf(f_out, "%d%s", codeword[i], (i == N - 1) ? "" : " ");
         }
         fprintf(f_out, "\n");
 
-        // --- 2. ¼g¤J Sigma ---
+        // --- 2. å¯«å…¥ Sigma ---
         fprintf(f_out, "%lf\n", sigma);
 
-        // --- 3. ¥Í¦¨¹L³q¹D«áªº y (BPSK: 0 -> +1.0, 1 -> -1.0) ---
+        // --- 3. ç”Ÿæˆéé€šé“å¾Œçš„ y (BPSK: 0 -> +1.0, 1 -> -1.0) ---
         for (int i = 0; i < N; i++) {
             double s = (codeword[i] == 0) ? 1.0 : -1.0;
             double noise = generate_gaussian(sigma);
@@ -293,7 +293,7 @@ void Generate_TestData(const int count, int N, int M, double EbN0_dB) {
         fprintf(f_out, "\n");
 
 
-        // ¨C¤@²Õ¤¤¶¡¥i¥H¥[­ÓªÅ¦æ¤è«K¦×²´¾\Åª¡]¥i¿ï¡^
+        // æ¯ä¸€çµ„ä¸­é–“å¯ä»¥åŠ å€‹ç©ºè¡Œæ–¹ä¾¿è‚‰çœ¼é–±è®€ï¼ˆå¯é¸ï¼‰
         // fprintf(f_out, "\n");
     }
     free(codeword);
@@ -307,7 +307,7 @@ void Generate_TestData(const int count, int N, int M, double EbN0_dB) {
 
 
 
-// ¸Ñ½X¨BÆJ
+// è§£ç¢¼æ­¥é©Ÿ
 bool isDecodeSucess(double* channel_sigma,int* decoder_iteration,int decoder_max_iteration, double* channel_output)
 {
     /** read file **/
@@ -349,7 +349,7 @@ bool isDecodeSucess(double* channel_sigma,int* decoder_iteration,int decoder_max
             first.minBetaValue=1e100;
             second.minBetaValue=1e100;
 
-            // ²Ä¤@¹M¹M¾ú¨C¤@row¡A¥ı²Î­p¨C¤@row¤¤ªº­t¸¹¦ì¸m©M³Ì¤p­È»P¦¸¤p­È¼Æ­È¤j¤p»P¦ì¸m
+            // ç¬¬ä¸€ééæ­·æ¯ä¸€rowï¼Œå…ˆçµ±è¨ˆæ¯ä¸€rowä¸­çš„è² è™Ÿä½ç½®å’Œæœ€å°å€¼èˆ‡æ¬¡å°å€¼æ•¸å€¼å¤§å°èˆ‡ä½ç½®
             //printf("ITERATION %d-%d-%d FIRST SETP\n",testtime,*decoder_iteration,i);
             for(int j=0;j<H_rows[i].row_weight;j++)// EX 2,3,4,5 in Hamming code first line
             {
@@ -383,7 +383,7 @@ bool isDecodeSucess(double* channel_sigma,int* decoder_iteration,int decoder_max
             }
             //printf("\n");
 
-            // ²Ä¤G¹M¹M¾ú­pºâ¥X¥Î©ó³Ì²×µ²ªGªº¦^¶Ç­È(¥HÁ`­t¸¹©MÁ`phi¼Æ­È­pºâ)©MÄ~Äò­¡¥NªºLLR(¥HÁ`­t¸¹¦©°£¸Ó¦ì¸m­t¸¹¼Æ¶q§PÂ_¥¿­t¡A¥HÁ`phi­È¦©°£¸Ó¦ì¸mphi¼Æ­È§PÂ_¼Æ­È¤j¤p)
+            // ç¬¬äºŒééæ­·è¨ˆç®—å‡ºç”¨æ–¼æœ€çµ‚çµæœçš„å›å‚³å€¼(ä»¥ç¸½è² è™Ÿå’Œç¸½phiæ•¸å€¼è¨ˆç®—)å’Œç¹¼çºŒè¿­ä»£çš„LLR(ä»¥ç¸½è² è™Ÿæ‰£é™¤è©²ä½ç½®è² è™Ÿæ•¸é‡åˆ¤æ–·æ­£è² ï¼Œä»¥ç¸½phiå€¼æ‰£é™¤è©²ä½ç½®phiæ•¸å€¼åˆ¤æ–·æ•¸å€¼å¤§å°)
             //printf("ITERATION %d-%d-%d SECOND SETP\n",testtime,*decoder_iteration,i);
             for(int j=0;j<H_rows[i].row_weight;j++)
             {
@@ -412,7 +412,7 @@ bool isDecodeSucess(double* channel_sigma,int* decoder_iteration,int decoder_max
         //printf("STEP3 in %d-%d iteration\n",testtime,*decoder_iteration);
         for(int i=0;i<N;i++)
         {
-            // ¤£¥i¥æ´«
+            // ä¸å¯äº¤æ›
             LLR_FinalResult[i]=LLR_Current[i]+ReturnTotal[i];
             LLR_Current[i]+=ReturnTotalExcpetI[i];
             //printf("LLR After->%llf\n",LLR_Current[i]);
