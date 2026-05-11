@@ -76,7 +76,7 @@ int main() {
     time(&start_read);
 
     //讀取Alist格式的H矩陣
-    Alist *Hmatrix = readalist("test.txt");
+    Alist *Hmatrix = readalist("AlistFile01.txt");
     if (!Hmatrix) return 1;
 
     //定義sigma^2、接收的碼字長度(N)、接收的碼字陣列、計算用的陣列、矩陣大小、最大迭代次數(15)、解碼後的碼字陣列
