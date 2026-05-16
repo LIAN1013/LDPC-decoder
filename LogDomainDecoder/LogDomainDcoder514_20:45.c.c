@@ -118,11 +118,15 @@ void Generate_TestData(const int count, int N, int M, double EbN0_dB) {
 
 // --- SPA 解碼核心副程式 ---
 double phi(double x) {
-    if (x < 1e-12) return 30.0;
+    // Version 1 : only limit maxinum minimum 
     double value = -log(tanh(x / 2.0));
-    if (value > 30.0) value = 30.0;
-    if (value < 1e-12) value = 1e-12;
-    return value;
+    if (value > 30.0) 
+        return 1e-13;
+    else if (value < 1e-13) 
+        return 30.0;
+    else 
+        return -log(tanh(x / 2.0));
+    // version 2 : Split to X(EX:8) point
 }
 
 bool isDecodeSucess(double* channel_sigma, int* decoder_iteration, int decoder_max_iteration, double* channel_output) {
