@@ -194,7 +194,7 @@ void initial(double* channel_sigma,double* LLR_Current,double* LLR_FinalResult)
     }
 }
 
-int s_tilde(int correctionValue, double x, double y){
+double s_tilde(int correctionValue, double x, double y){
     if(fabs(x + y) < 2 && fabs(x - y) > 2*fabs(x + y)) return correctionValue;
     else if(fabs(x - y) < 2 && fabs(x + y) > 2*fabs(x - y)) return -correctionValue;
     else return 0;
