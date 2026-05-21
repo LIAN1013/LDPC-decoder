@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -24,20 +25,20 @@ typedef struct
 } minBeta;
 
 int N = -1, K = -1, M = -1;
-RowInfo *H_rows = NULL;
-ColInfo *H_cols = NULL;
+RowInfo* H_rows = NULL;
+ColInfo* H_cols = NULL;
 
 // 【全新登場】集中管理所有連邊資訊的一維大陣列（告別零碎記憶體）
-int *H_rows_data = NULL; // 集中存放所有 Check Node 連接的 V-node 編號
-int *H_cols_data = NULL; // 集中存放所有 Variable Node 連接的 C-node 編號
+int* H_rows_data = NULL; // 集中存放所有 Check Node 連接的 V-node 編號
+int* H_cols_data = NULL; // 集中存放所有 Variable Node 連接的 C-node 編號
 
 long long GLOBAL_TRUEBIT, GLOBAL_FALSEBIT;
 const int for_test_only_true_time_max = 0;
 
 void Read_H_MatrixByAlist(void)
 {
-    char filename[100] = {"C:\\Users\\user\\Documents\\project\\Gallager_3_6.txt"};
-    FILE *fp = fopen(filename, "r");
+    char filename[100] = { "C:\\Users\\user\\Documents\\project\\Gallager_3_6.txt" };
+    FILE* fp = fopen(filename, "r");
 
     if (!fp)
     {
@@ -51,8 +52,8 @@ void Read_H_MatrixByAlist(void)
     fscanf(fp, "%d %d", &N, &M);
     fscanf(fp, "%d %d", &max_row_weight, &max_col_weight);
 
-    H_rows = (RowInfo *)malloc(M * sizeof(RowInfo));
-    H_cols = (ColInfo *)malloc(N * sizeof(ColInfo));
+    H_rows = (RowInfo*)malloc(M * sizeof(RowInfo));
+    H_cols = (ColInfo*)malloc(N * sizeof(ColInfo));
 
     // column
     for (int i = 0; i < N; i++)
@@ -79,8 +80,8 @@ void Read_H_MatrixByAlist(void)
     }
     int total_row_edges = H_rows[M - 1].row_offset + H_rows[M - 1].row_weight;
 
-    H_cols_data = (int *)malloc(total_col_edges * sizeof(int));
-    H_rows_data = (int *)malloc(total_row_edges * sizeof(int));
+    H_cols_data = (int*)malloc(total_col_edges * sizeof(int));
+    H_rows_data = (int*)malloc(total_row_edges * sizeof(int));
     // dim2
     int temp = 0;
     for (int i = 0; i < N; i++)
@@ -144,7 +145,7 @@ double generate_gaussian(double sigma)
 void Generate_TestData(const int count, int N, int M, double EbN0_dB)
 {
     char output_name[] = "C:\\Users\\user\\Documents\\project\\test_data.txt";
-    FILE *f_out = fopen(output_name, "w");
+    FILE* f_out = fopen(output_name, "w");
     if (!f_out)
     {
         perror("Failed to open output file");
@@ -158,7 +159,7 @@ void Generate_TestData(const int count, int N, int M, double EbN0_dB)
 
     srand((unsigned int)time(NULL));
 
-    int *codeword = (int *)calloc(N, sizeof(int));
+    int* codeword = (int*)calloc(N, sizeof(int));
 
     for (int c = 0; c < count; c++)
     {
@@ -207,40 +208,47 @@ double s_tilde(double correctionValue, double x, double y)
         return 0;
 }
 
-bool isDecodeSucess(double *channel_sigma, int *decoder_iteration, int decoder_max_iteration, double *LLR_Current)
+bool isDecodeSucess(double* channel_sigma, int* decoder_iteration, int decoder_max_iteration, double* LLR_Current)
 {
     if (N == -1 || M == -1) {
         printf("[SYSTEM] READ Alist Failed\n");
         return false;
     }
 
-    double *LLR_FinalResult = (double *)malloc(N * sizeof(double));
-    int *Ci = (int *)malloc(N * sizeof(int));
-    double *ReturnTotal = (double *)malloc(N * sizeof(double));
+    double* LLR_FinalResult = (double*)malloc(N * sizeof(double));
+    int* Ci = (int*)malloc(N * sizeof(int));
+    double* ReturnTotal = (double*)malloc(N * sizeof(double));
 
-    // 配置邊訊息陣列，防止 LLR_Current 持續正回饋爆掉
+    // 計算總邊數
     int total_row_edges = H_rows[M - 1].row_offset + H_rows[M - 1].row_weight;
-    double *R_c2v = (double *)calloc(total_row_edges, sizeof(double));
+    double* R_c2v = (double*)calloc(total_row_edges, sizeof(double));
 
-    // 配置臨時變數，安全隔離 main 的 channel_output
-    double *Q_v2c = (double *)malloc(N * sizeof(double));
+    // 💡 核心修改 1：將 Q_v2c 改配置為「總邊數」大小的二維邊訊息陣列，使每條邊互相獨立
+    double* Q_v2c = (double*)malloc(total_row_edges * sizeof(double));
 
     // 初始化 LLR
     double sigma_sq = (*channel_sigma) * (*channel_sigma);
-    for (int i = 0; i < N; i++)
+    
+    // 💡 核心修改 2：第一動初始化，每條邊上的 V2C 訊息都直接填入通道的原始 LLR 輸入
+    for (int i = 0; i < M; i++)
     {
-        // 💡 修正：直接讀取 LLR_Current 作為 channel 原始輸入，不弄髒 main 的陣列
-        Q_v2c[i] = 2.0 * LLR_Current[i] / sigma_sq;
-        LLR_FinalResult[i] = Q_v2c[i];
+        int start = H_rows[i].row_offset;
+        int end = start + H_rows[i].row_weight;
+        for (int k = start; k < end; k++)
+        {
+            int v_node = H_rows_data[k];
+            Q_v2c[k] = 2.0 * LLR_Current[v_node] / sigma_sq;
+        }
     }
 
     *decoder_iteration = 0;
-    double correctionValue = 0.5;
+    double correctionValue = 0.1;
     bool isAllZero = false;
 
-    // --- 解碼主迴圈（這裡專心解碼，不統計位元錯誤） ---
+    // --- 解碼主迴圈 ---
     while (*decoder_iteration < decoder_max_iteration)
     {
+        // 每次迭代開始前，清空 Variable Node 的外部訊息累加帳本
         for (int i = 0; i < N; i++) ReturnTotal[i] = 0.0;
 
         /// --- STEP 1: CHECK NODE UPDATE ---
@@ -256,7 +264,8 @@ bool isDecodeSucess(double *channel_sigma, int *decoder_iteration, int decoder_m
             for (int k = start; k < end; k++)
             {
                 int v_node = H_rows_data[k];
-                double v_message = Q_v2c[v_node] - R_c2v[k];
+                // 💡 核心修改 3：直接讀取邊訊息 Q_v2c[k]，此時它已經在上一次迭代被精確排除自己了
+                double v_message = Q_v2c[k]; 
 
                 if (v_message < 0) TotalNegativeCount++;
 
@@ -264,10 +273,12 @@ bool isDecodeSucess(double *channel_sigma, int *decoder_iteration, int decoder_m
                 if (tempValue < first.minBetaValue) {
                     third = second; second = first;
                     first.minBetaValue = tempValue; first.minBetaPosition = v_node;
-                } else if (tempValue < second.minBetaValue) {
+                }
+                else if (tempValue < second.minBetaValue) {
                     third = second;
                     second.minBetaValue = tempValue; second.minBetaPosition = v_node;
-                } else if (tempValue < third.minBetaValue) {
+                }
+                else if (tempValue < third.minBetaValue) {
                     third.minBetaValue = tempValue;
                 }
             }
@@ -275,7 +286,8 @@ bool isDecodeSucess(double *channel_sigma, int *decoder_iteration, int decoder_m
             for (int k = start; k < end; k++)
             {
                 int tempPosition = H_rows_data[k];
-                double v_message = Q_v2c[tempPosition] - R_c2v[k];
+                // 💡 核心修改 4：同樣直接讀取邊訊息 Q_v2c[k]
+                double v_message = Q_v2c[k]; 
 
                 int self_sign = (v_message < 0) ? -1 : 1;
                 int alpha = (TotalNegativeCount % 2 == 0) ? 1 : -1;
@@ -287,29 +299,44 @@ bool isDecodeSucess(double *channel_sigma, int *decoder_iteration, int decoder_m
                 if (tempPosition == first.minBetaPosition) {
                     s_correction = s_tilde(correctionValue, second.minBetaValue, third.minBetaValue);
                     pureMinValues = second.minBetaValue;
-                } else if (tempPosition == second.minBetaPosition) {
+                }
+                else if (tempPosition == second.minBetaPosition) {
                     s_correction = s_tilde(correctionValue, first.minBetaValue, third.minBetaValue);
                     pureMinValues = first.minBetaValue;
-                } else {
+                }
+                else {
                     s_correction = s_tilde(correctionValue, first.minBetaValue, second.minBetaValue);
                     pureMinValues = first.minBetaValue;
                 }
 
                 double new_R = exclusion_alpha * (pureMinValues + s_correction);
                 R_c2v[k] = new_R;
-                ReturnTotal[tempPosition] += new_R;
+                ReturnTotal[tempPosition] += new_R; // 累加給該 Variable Node 算總分
             }
         }
 
         /// --- STEP 2: VARIABLE NODE UPDATE & HARD DECISION ---
+        // 💡 核心修改 5：硬判決（包含全部資料，不排除任何邊資訊）
         for (int i = 0; i < N; i++)
         {
             double LLR_intrinsic = 2.0 * LLR_Current[i] / sigma_sq;
-            LLR_FinalResult[i] = LLR_intrinsic + ReturnTotal[i];
-            Q_v2c[i] = LLR_FinalResult[i];
+            LLR_FinalResult[i] = LLR_intrinsic + ReturnTotal[i]; // 包含全部 Check Node 的新情報
 
             // 盲判決：大於等於 0 就是 0，小於 0 就是 1
             Ci[i] = (LLR_FinalResult[i] >= 0.0) ? 0 : 1;
+        }
+
+        // 💡 核心修改 6：更新邊訊息 Q_v2c[k]（精確排除自己）
+        // 傳給特定 Check Node 的邊訊息 = 該節點的 LLR 總分 - 該條邊上一次傳進來的 R_c2v
+        for (int i = 0; i < M; i++)
+        {
+            int start = H_rows[i].row_offset;
+            int end = start + H_rows[i].row_weight;
+            for (int k = start; k < end; k++)
+            {
+                int v_node = H_rows_data[k];
+                Q_v2c[k] = LLR_FinalResult[v_node] - R_c2v[k]; // 👈 完美達成排除自己
+            }
         }
 
         /// --- STEP 3: PARITY CHECK (H * c^T == 0) ---
@@ -333,41 +360,39 @@ bool isDecodeSucess(double *channel_sigma, int *decoder_iteration, int decoder_m
         *decoder_iteration += 1;
     }
 
-    /// --- 💡 【核心修改】終點線記分板：不論成功或失敗，此時解碼器已定案 ---
+    /// --- 終點線記分板（保持全 0 測試碼的統計邏輯） ---
     long long this_block_true = 0;
     long long this_block_false = 0;
 
     for (int i = 0; i < N; i++)
     {
-        // 因為模擬測試已知發送端密碼一定是全 0
         if (Ci[i] == 0) {
-            this_block_true++;  // 判決為 0 才是對的
-        } else {
-            this_block_false++; // 判決為 1 就是錯的
+            this_block_true++;  
+        }
+        else {
+            this_block_false++; 
         }
     }
 
-    // 將這一動的最終結果，累加到全域統計變數
     GLOBAL_TRUEBIT += this_block_true;
     GLOBAL_FALSEBIT += this_block_false;
 
     // 釋放記憶體
     free(LLR_FinalResult); free(Ci); free(ReturnTotal); free(R_c2v); free(Q_v2c);
 
-    return isAllZero; // 回傳最終結果是否通過校驗矩陣
+    return isAllZero; 
 }
-
 int main(void)
 {
     clock_t start_read, end_read, start_run, end_run;
     // Read H Matrix
     start_read = clock();
     Read_H_MatrixByAlist();
-    const int num_test_cases = 10000;
-    const int deocder_iteration_max = 20;
+    const int num_test_cases = 1000;
+    const int deocder_iteration_max = 16;
     const double EbN0_dB = 1.6;
 
-    int *TEST_countEachIteration = (int *)malloc(num_test_cases * sizeof(int));
+    int* TEST_countEachIteration = (int*)malloc(num_test_cases * sizeof(int));
 
     // initial
     for (int i = 0; i < num_test_cases; i++)
@@ -381,20 +406,20 @@ int main(void)
     Generate_TestData(num_test_cases, N, M, EbN0_dB);
 
     // open test data file
-    char filename[100] = {"C:\\Users\\user\\Documents\\project\\test_data.txt"};
-    FILE *TEST_DATA = fopen(filename, "r");
+    char filename[100] = { "C:\\Users\\user\\Documents\\project\\test_data.txt" };
+    FILE* TEST_DATA = fopen(filename, "r");
     if (!TEST_DATA)
     {
         printf("[SYSTEM]MAIN_Open file failed\n");
-        return false;
+        return 0; // 💡 順手幫你將 main 的錯誤回傳改成標準 int 值 0
     }
     end_read = clock();
     printf("Read time: %lf\n", (double)(end_read - start_read) / CLOCKS_PER_SEC);
 
     // allocate memory for y(after AWGN channel)
-    double *channel_output = (double *)malloc(N * sizeof(double));
-    double *channel_sigma = (double *)malloc(sizeof(double));
-    int *decode_iteration = (int *)malloc(sizeof(int));
+    double* channel_output = (double*)malloc(N * sizeof(double));
+    double* channel_sigma = (double*)malloc(sizeof(double));
+    int* decode_iteration = (int*)malloc(sizeof(int));
 
     start_run = clock();
     for (int testtime = 0; testtime < num_test_cases; testtime++)
@@ -428,12 +453,10 @@ int main(void)
         }
         //ST_countEachIteration[testtime] = *decode_iteration;
 
-
     }
 
-
     end_run = clock();
-    printf("Run time: %lf\n", (double)(end_run- start_run) / CLOCKS_PER_SEC);
+    printf("Run time: %lf\n", (double)(end_run - start_run) / CLOCKS_PER_SEC);
     printf("Total Test Time = %d\n", num_test_cases);
     printf("deocder_iteration_max = %d\n", deocder_iteration_max);
     printf("MAIN_SucessTime = %d   Failed Time = %d\n", totalSucessTime, totalFailTime);
@@ -444,7 +467,20 @@ int main(void)
     double GLOBAL_ERR_RATE = (double)GLOBAL_FALSEBIT / (double)(GLOBAL_TRUEBIT + GLOBAL_FALSEBIT);
     printf("MIAN_TRUEBIT = %lld  FALSEBIT = %lld\nMAIN_ERROR_RATE = %g\n\n", GLOBAL_TRUEBIT, GLOBAL_FALSEBIT, GLOBAL_ERR_RATE);
 
+    printf("---------------------------------------------\n");
+    // BER 實際上就是你原本算出來的 GLOBAL_ERR_RATE
+    printf("Bit Error Rate (BER)  : %e\n", GLOBAL_ERR_RATE);
+    // FER = 解碼失敗的訊框數 (totalFailTime) / 總測試訊框數 (num_test_cases)
+    printf("Frame Error Rate (FER): %e\n", (double)totalFailTime / (double)num_test_cases);
+
+
     // printf("MAIN_Run More %d TIMEs\n", for_test_only_true_time_max);
+
+    // 釋放動態記憶體避免 Memory Leak
+    free(TEST_countEachIteration);
+    free(channel_output);
+    free(channel_sigma);
+    free(decode_iteration);
 
     return 0;
 }
